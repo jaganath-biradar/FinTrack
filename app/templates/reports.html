@@ -1,0 +1,146 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="ft-shell" id="ftShell">
+
+  <aside class="ft-sidebar" id="ftSidebar">
+    <div class="ft-sidebar-inner">
+      <div class="ft-brand">
+        <div class="ft-brand-icon"><i data-lucide="zap" class="w-[17px] h-[17px] text-white"></i></div>
+        <span class="ft-brand-name">FinTrack</span>
+      </div>
+      <p class="ft-nav-label">Main</p>
+      <nav class="ft-nav">
+        <a href="/dashboard" class="ft-nav-item"><i data-lucide="layout-dashboard"></i><span>Dashboard</span></a>
+        <a href="/income"    class="ft-nav-item"><i data-lucide="trending-up"></i><span>Income</span></a>
+        <a href="/expenses"  class="ft-nav-item"><i data-lucide="receipt"></i><span>Expenses</span></a>
+        <a href="/budget"    class="ft-nav-item"><i data-lucide="wallet"></i><span>Budget</span></a>
+      </nav>
+      <p class="ft-nav-label">Portfolio</p>
+      <nav class="ft-nav">
+        <a href="/investments"   class="ft-nav-item"><i data-lucide="bar-chart-2"></i><span>Investments</span></a>
+        <a href="/savings-goals" class="ft-nav-item"><i data-lucide="piggy-bank"></i><span>Savings Goals</span></a>
+        <a href="/reports"       class="ft-nav-item ft-active"><i data-lucide="file-bar-chart"></i><span>Reports</span></a>
+      </nav>
+      <div class="ft-sidebar-spacer"></div>
+      <nav class="ft-nav">
+        <a href="/settings" class="ft-nav-item"><i data-lucide="settings-2"></i><span>Settings</span></a>
+      </nav>
+      <div class="ft-sidebar-user">
+        <div class="ft-user-av">{{ current_user.full_name[0] | upper }}</div>
+        <div class="ft-user-info">
+          <p class="ft-user-name">{{ current_user.full_name }}</p>
+          <p class="ft-user-plan">Premium Plan</p>
+        </div>
+        <a href="/auth/logout" class="ft-logout-btn" title="Sign out">
+          <i data-lucide="log-out" class="w-4 h-4"></i>
+        </a>
+      </div>
+    </div>
+  </aside>
+
+  <div class="ft-main-wrap" id="ftMainWrap">
+    <header class="ft-topnav">
+      <div class="ft-topnav-left">
+        <button class="ft-toggle-btn" id="ftToggle"><i data-lucide="menu" class="w-[17px] h-[17px]"></i></button>
+        <div class="ft-breadcrumb">
+          <span class="ft-bc-root">FinTrack</span>
+          <i data-lucide="chevron-right" class="w-3.5 h-3.5" style="color:var(--t3)"></i>
+          <span class="ft-bc-page">Reports</span>
+        </div>
+      </div>
+      <div class="ft-topnav-right">
+        <div class="ft-month-badge"><i data-lucide="calendar-days" class="w-3.5 h-3.5"></i><span>{{ today if today is defined else '' }}</span></div>
+        <button class="ft-icon-btn"><i data-lucide="bell" class="w-4 h-4"></i><span class="ft-notif-pip"></span></button>
+        <div class="ft-topnav-av">{{ current_user.full_name[0] | upper }}</div>
+      </div>
+    </header>
+
+    <main class="ft-page">
+      <div class="pg-header">
+        <h1>Financial Reports</h1>
+        <p>Download monthly summaries and performance reports in PDF format.</p>
+      </div>
+
+      <!-- Report cards -->
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:20px;margin-bottom:28px">
+
+        <!-- Monthly PDF Report -->
+        <div class="ft-card" style="padding:24px">
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
+            <div class="pg-stat-icon pg-stat-icon-green" style="width:40px;height:40px;flex-shrink:0">
+              <i data-lucide="file-text" class="w-5 h-5"></i>
+            </div>
+            <div>
+              <p style="font-weight:700;color:var(--t1)">Monthly Financial Report</p>
+              <p style="font-size:0.72rem;color:var(--t3)">Income, expenses &amp; net worth summary</p>
+            </div>
+          </div>
+          <form id="reportForm">
+            <div class="pg-form-group" style="margin-bottom:12px">
+              <label for="month">Select Month</label>
+              <input id="month" name="month" type="month" required style="width:100%" />
+            </div>
+            <button type="submit" class="pg-btn-submit" style="width:100%">
+              <i data-lucide="download" class="w-4 h-4"></i> Download PDF
+            </button>
+          </form>
+        </div>
+
+        <!-- Budget Performance -->
+        <div class="ft-card" style="padding:24px">
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
+            <div class="pg-stat-icon pg-stat-icon-amber" style="width:40px;height:40px;flex-shrink:0">
+              <i data-lucide="bar-chart-2" class="w-5 h-5"></i>
+            </div>
+            <div>
+              <p style="font-weight:700;color:var(--t1)">Budget Performance</p>
+              <p style="font-size:0.72rem;color:var(--t3)">Compliance &amp; overspending analysis</p>
+            </div>
+          </div>
+          <p style="font-size:0.82rem;color:var(--t2);margin-bottom:16px">
+            Evaluate how well you stayed within your monthly category limits and identify areas of overspending.
+          </p>
+          <a href="/budget" class="pg-btn-submit" style="display:flex;align-items:center;gap:6px;justify-content:center;text-decoration:none">
+            <i data-lucide="arrow-right" class="w-4 h-4"></i> View Budget
+          </a>
+        </div>
+
+        <!-- Investment Summary -->
+        <div class="ft-card" style="padding:24px">
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
+            <div class="pg-stat-icon pg-stat-icon-sky" style="width:40px;height:40px;flex-shrink:0">
+              <i data-lucide="trending-up" class="w-5 h-5"></i>
+            </div>
+            <div>
+              <p style="font-weight:700;color:var(--t1)">Investment Summary</p>
+              <p style="font-size:0.72rem;color:var(--t3)">Portfolio growth &amp; returns overview</p>
+            </div>
+          </div>
+          <p style="font-size:0.82rem;color:var(--t2);margin-bottom:16px">
+            Review your portfolio allocation, expected returns, and track performance across all asset classes.
+          </p>
+          <a href="/investments" class="pg-btn-submit" style="display:flex;align-items:center;gap:6px;justify-content:center;text-decoration:none">
+            <i data-lucide="arrow-right" class="w-4 h-4"></i> View Portfolio
+          </a>
+        </div>
+
+      </div>
+    </main>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const form = document.getElementById('reportForm');
+  if (form) {
+    form.addEventListener('submit', e => {
+      e.preventDefault();
+      const val = form.month.value;
+      if (!val) return;
+      const [year, month] = val.split('-');
+      window.location.href = `/api/reports/monthly/pdf?month=${month}&year=${year}`;
+    });
+  }
+});
+</script>
+{% endblock %}

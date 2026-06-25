@@ -1,0 +1,210 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="ft-shell" id="ftShell">
+
+  <aside class="ft-sidebar" id="ftSidebar">
+    <div class="ft-sidebar-inner">
+      <div class="ft-brand">
+        <div class="ft-brand-icon"><i data-lucide="zap" class="w-[17px] h-[17px] text-white"></i></div>
+        <span class="ft-brand-name">FinTrack</span>
+      </div>
+      <p class="ft-nav-label">Main</p>
+      <nav class="ft-nav">
+        <a href="/dashboard" class="ft-nav-item"><i data-lucide="layout-dashboard"></i><span>Dashboard</span></a>
+        <a href="/income"    class="ft-nav-item"><i data-lucide="trending-up"></i><span>Income</span></a>
+        <a href="/expenses"  class="ft-nav-item"><i data-lucide="receipt"></i><span>Expenses</span></a>
+        <a href="/budget"    class="ft-nav-item"><i data-lucide="wallet"></i><span>Budget</span></a>
+      </nav>
+      <p class="ft-nav-label">Portfolio</p>
+      <nav class="ft-nav">
+        <a href="/investments"   class="ft-nav-item"><i data-lucide="bar-chart-2"></i><span>Investments</span></a>
+        <a href="/savings-goals" class="ft-nav-item ft-active"><i data-lucide="piggy-bank"></i><span>Savings Goals</span></a>
+        <a href="/reports"       class="ft-nav-item"><i data-lucide="file-bar-chart"></i><span>Reports</span></a>
+      </nav>
+      <div class="ft-sidebar-spacer"></div>
+      <nav class="ft-nav">
+        <a href="/settings" class="ft-nav-item"><i data-lucide="settings-2"></i><span>Settings</span></a>
+      </nav>
+      <div class="ft-sidebar-user">
+        <div class="ft-user-av">{{ current_user.full_name[0] | upper }}</div>
+        <div class="ft-user-info">
+          <p class="ft-user-name">{{ current_user.full_name }}</p>
+          <p class="ft-user-plan">Premium Plan</p>
+        </div>
+        <a href="/auth/logout" class="ft-logout-btn" title="Sign out">
+          <i data-lucide="log-out" class="w-4 h-4"></i>
+        </a>
+      </div>
+    </div>
+  </aside>
+
+  <div class="ft-main-wrap" id="ftMainWrap">
+    <header class="ft-topnav">
+      <div class="ft-topnav-left">
+        <button class="ft-toggle-btn" id="ftToggle"><i data-lucide="menu" class="w-[17px] h-[17px]"></i></button>
+        <div class="ft-breadcrumb">
+          <span class="ft-bc-root">FinTrack</span>
+          <i data-lucide="chevron-right" class="w-3.5 h-3.5" style="color:var(--t3)"></i>
+          <span class="ft-bc-page">Savings Goals</span>
+        </div>
+      </div>
+      <div class="ft-topnav-right">
+        <div class="ft-month-badge"><i data-lucide="calendar-days" class="w-3.5 h-3.5"></i><span>{{ today if today is defined else '' }}</span></div>
+        <button class="ft-icon-btn"><i data-lucide="bell" class="w-4 h-4"></i><span class="ft-notif-pip"></span></button>
+        <div class="ft-topnav-av">{{ current_user.full_name[0] | upper }}</div>
+      </div>
+    </header>
+
+    <main class="ft-page">
+      <div class="pg-header">
+        <h1>Savings Goals</h1>
+        <p>Define goals, update progress, and track completion status.</p>
+      </div>
+
+      <!-- Stats -->
+      {% set total_target  = goals | sum(attribute='target_amount')  if goals else 0 %}
+      {% set total_saved   = goals | sum(attribute='current_amount') if goals else 0 %}
+      {% set count         = goals | length %}
+      <div class="pg-stats-row">
+        <div class="pg-stat-card">
+          <div class="pg-stat-icon pg-stat-icon-sky"><i data-lucide="piggy-bank" class="w-5 h-5"></i></div>
+          <div class="pg-stat-info">
+            <span class="pg-stat-label">Total Saved</span>
+            <span class="pg-stat-value">₹{{ '%.2f' | format(total_saved) }}</span>
+            <span class="pg-stat-sub">Across all goals</span>
+          </div>
+        </div>
+        <div class="pg-stat-card">
+          <div class="pg-stat-icon pg-stat-icon-amber"><i data-lucide="target" class="w-5 h-5"></i></div>
+          <div class="pg-stat-info">
+            <span class="pg-stat-label">Total Target</span>
+            <span class="pg-stat-value">₹{{ '%.2f' | format(total_target) }}</span>
+            <span class="pg-stat-sub">Combined goals</span>
+          </div>
+        </div>
+        <div class="pg-stat-card">
+          <div class="pg-stat-icon pg-stat-icon-green"><i data-lucide="list" class="w-5 h-5"></i></div>
+          <div class="pg-stat-info">
+            <span class="pg-stat-label">Active Goals</span>
+            <span class="pg-stat-value">{{ count }}</span>
+            <span class="pg-stat-sub">Total goals</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Add Goal Form -->
+      <div class="pg-form-card">
+        <h3><i data-lucide="plus-circle" class="w-4 h-4" style="color:var(--accent2)"></i> Create New Goal <span class="h3-badge">Quick Entry</span></h3>
+        <form id="goalForm" autocomplete="off">
+          <div class="pg-form-grid">
+            <div class="pg-form-group">
+              <label for="goal_name">Goal Name</label>
+              <input id="goal_name" name="goal_name" type="text" placeholder="Emergency Fund, Vacation…" required />
+            </div>
+            <div class="pg-form-group">
+              <label for="target_amount">Target Amount (₹)</label>
+              <input id="target_amount" name="target_amount" type="number" step="0.01" min="1" placeholder="0.00" required />
+            </div>
+            <div class="pg-form-group">
+              <label for="current_amount">Current Amount (₹)</label>
+              <input id="current_amount" name="current_amount" type="number" step="0.01" min="0" placeholder="0.00" value="0" required />
+            </div>
+            <div class="pg-form-group">
+              <label for="target_date">Target Date</label>
+              <input id="target_date" name="target_date" type="date" required />
+            </div>
+            <button type="submit" class="pg-btn-submit"><i data-lucide="plus" class="w-4 h-4"></i> Create Goal</button>
+          </div>
+          <div id="formMsg" class="pg-form-msg"></div>
+        </form>
+      </div>
+
+      <!-- Goals Cards -->
+      {% if goals %}
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;margin-bottom:24px">
+        {% for goal in goals %}
+        {% set progress = (goal.current_amount / goal.target_amount * 100) | round(1) if goal.target_amount else 0 %}
+        <div class="ft-card" style="padding:20px" id="goal-{{ goal.id }}">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px">
+            <div>
+              <p style="font-weight:700;font-size:0.95rem;color:var(--t1)">{{ goal.goal_name }}</p>
+              <p style="font-size:0.72rem;color:var(--t3);margin-top:2px">Target: {{ goal.target_date.strftime('%b %Y') }}</p>
+            </div>
+            <span style="font-size:0.78rem;font-weight:700;color:{% if progress >= 100 %}var(--accent){% else %}var(--accent2){% endif %}">{{ progress }}%</span>
+          </div>
+          <div style="height:6px;background:var(--b2);border-radius:4px;overflow:hidden;margin-bottom:10px">
+            <div style="width:{{ [progress,100]|min }}%;height:100%;background:var(--accent);border-radius:4px"></div>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:0.78rem;color:var(--t2)">
+            <span>₹{{ '%.0f'|format(goal.current_amount) }} saved</span>
+            <span>of ₹{{ '%.0f'|format(goal.target_amount) }}</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px">
+            <span class="pg-chip pg-chip-default" style="font-size:0.7rem">{{ goal.status | title }}</span>
+            <button class="pg-action-btn pg-delete" data-id="{{ goal.id }}" title="Delete">
+              <i data-lucide="trash-2" class="w-3.5 h-3.5"></i> Delete
+            </button>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <div class="pg-table-card">
+        <div class="pg-table-empty">
+          <i data-lucide="piggy-bank" style="width:36px;height:36px;margin:0 auto 10px;display:block;color:var(--t3)"></i>
+          <p>No savings goals set yet. Create your first one above.</p>
+        </div>
+      </div>
+      {% endif %}
+    </main>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const form = document.getElementById('goalForm');
+  const msg  = document.getElementById('formMsg');
+  if (form) {
+    form.addEventListener('submit', async e => {
+      e.preventDefault();
+      const fd = new FormData(form);
+      const payload = {
+        goal_name:      fd.get('goal_name').trim(),
+        target_amount:  parseFloat(fd.get('target_amount')),
+        current_amount: parseFloat(fd.get('current_amount')),
+        target_date:    fd.get('target_date'),
+        status:         'active',
+      };
+      const res = await fetch('/api/savings/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      if (res.ok) {
+        msg.className = 'pg-form-msg success';
+        msg.textContent = '✓ Goal created!';
+        form.reset();
+        setTimeout(() => window.location.reload(), 900);
+      } else {
+        const err = await res.json().catch(() => ({}));
+        msg.className = 'pg-form-msg error';
+        msg.textContent = '✗ ' + (err.detail || 'Failed to create goal.');
+      }
+    });
+  }
+
+  document.querySelectorAll('.pg-delete[data-id]').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      if (!confirm('Delete this goal?')) return;
+      const id  = btn.dataset.id;
+      const res = await fetch(`/api/savings/${id}`, { method: 'DELETE' });
+      if (res.ok || res.status === 204) {
+        document.getElementById(`goal-${id}`)?.remove();
+      } else {
+        alert('Could not delete. Please try again.');
+      }
+    });
+  });
+});
+</script>
+{% endblock %}

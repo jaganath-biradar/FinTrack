@@ -1,0 +1,196 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="ft-shell" id="ftShell">
+
+  <aside class="ft-sidebar" id="ftSidebar">
+    <div class="ft-sidebar-inner">
+      <div class="ft-brand">
+        <div class="ft-brand-icon"><i data-lucide="zap" class="w-[17px] h-[17px] text-white"></i></div>
+        <span class="ft-brand-name">FinTrack</span>
+      </div>
+      <p class="ft-nav-label">Main</p>
+      <nav class="ft-nav">
+        <a href="/dashboard" class="ft-nav-item"><i data-lucide="layout-dashboard"></i><span>Dashboard</span></a>
+        <a href="/income"    class="ft-nav-item"><i data-lucide="trending-up"></i><span>Income</span></a>
+        <a href="/expenses"  class="ft-nav-item"><i data-lucide="receipt"></i><span>Expenses</span></a>
+        <a href="/budget"    class="ft-nav-item ft-active"><i data-lucide="wallet"></i><span>Budget</span></a>
+      </nav>
+      <p class="ft-nav-label">Portfolio</p>
+      <nav class="ft-nav">
+        <a href="/investments"   class="ft-nav-item"><i data-lucide="bar-chart-2"></i><span>Investments</span></a>
+        <a href="/savings-goals" class="ft-nav-item"><i data-lucide="piggy-bank"></i><span>Savings Goals</span></a>
+        <a href="/reports"       class="ft-nav-item"><i data-lucide="file-bar-chart"></i><span>Reports</span></a>
+      </nav>
+      <div class="ft-sidebar-spacer"></div>
+      <nav class="ft-nav">
+        <a href="/settings" class="ft-nav-item"><i data-lucide="settings-2"></i><span>Settings</span></a>
+      </nav>
+      <div class="ft-sidebar-user">
+        <div class="ft-user-av">{{ current_user.full_name[0] | upper }}</div>
+        <div class="ft-user-info">
+          <p class="ft-user-name">{{ current_user.full_name }}</p>
+          <p class="ft-user-plan">Premium Plan</p>
+        </div>
+        <a href="/auth/logout" class="ft-logout-btn" title="Sign out">
+          <i data-lucide="log-out" class="w-4 h-4"></i>
+        </a>
+      </div>
+    </div>
+  </aside>
+
+  <div class="ft-main-wrap" id="ftMainWrap">
+    <header class="ft-topnav">
+      <div class="ft-topnav-left">
+        <button class="ft-toggle-btn" id="ftToggle"><i data-lucide="menu" class="w-[17px] h-[17px]"></i></button>
+        <div class="ft-breadcrumb">
+          <span class="ft-bc-root">FinTrack</span>
+          <i data-lucide="chevron-right" class="w-3.5 h-3.5" style="color:var(--t3)"></i>
+          <span class="ft-bc-page">Budget</span>
+        </div>
+      </div>
+      <div class="ft-topnav-right">
+        <div class="ft-month-badge"><i data-lucide="calendar-days" class="w-3.5 h-3.5"></i><span>{{ today if today is defined else '' }}</span></div>
+        <button class="ft-icon-btn"><i data-lucide="bell" class="w-4 h-4"></i><span class="ft-notif-pip"></span></button>
+        <div class="ft-topnav-av">{{ current_user.full_name[0] | upper }}</div>
+      </div>
+    </header>
+
+    <main class="ft-page">
+      <div class="pg-header">
+        <h1>Budget Planner</h1>
+        <p>Create monthly limits, monitor spending, and stay under budget.</p>
+      </div>
+
+      <!-- Stats -->
+      {% set total_limit = budgets | sum(attribute='monthly_limit') if budgets else 0 %}
+      {% set total_spent = budgets | sum(attribute='spent_amount') if budgets else 0 %}
+      {% set total_remaining = budgets | sum(attribute='remaining') if budgets else 0 %}
+      <div class="pg-stats-row">
+        <div class="pg-stat-card">
+          <div class="pg-stat-icon pg-stat-icon-green"><i data-lucide="wallet" class="w-5 h-5"></i></div>
+          <div class="pg-stat-info">
+            <span class="pg-stat-label">Total Budget</span>
+            <span class="pg-stat-value">₹{{ '%.2f' | format(total_limit) }}</span>
+            <span class="pg-stat-sub">This month</span>
+          </div>
+        </div>
+        <div class="pg-stat-card">
+          <div class="pg-stat-icon pg-stat-icon-red"><i data-lucide="trending-down" class="w-5 h-5"></i></div>
+          <div class="pg-stat-info">
+            <span class="pg-stat-label">Total Spent</span>
+            <span class="pg-stat-value">₹{{ '%.2f' | format(total_spent) }}</span>
+            <span class="pg-stat-sub">This month</span>
+          </div>
+        </div>
+        <div class="pg-stat-card">
+          <div class="pg-stat-icon pg-stat-icon-amber"><i data-lucide="piggy-bank" class="w-5 h-5"></i></div>
+          <div class="pg-stat-info">
+            <span class="pg-stat-label">Remaining</span>
+            <span class="pg-stat-value">₹{{ '%.2f' | format(total_remaining) }}</span>
+            <span class="pg-stat-sub">Available</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Add Budget Form -->
+      <div class="pg-form-card">
+        <h3><i data-lucide="plus-circle" class="w-4 h-4" style="color:var(--accent2)"></i> Add Budget Limit <span class="h3-badge">Monthly</span></h3>
+        <form id="budgetForm" autocomplete="off">
+          <div class="pg-form-grid">
+            <div class="pg-form-group">
+              <label for="category">Category</label>
+              <select id="category" name="category" required>
+                {% for cat in ["Food","Rent","Travel","Shopping","Healthcare","Utilities","Entertainment","Education","Others"] %}
+                <option value="{{ cat }}">{{ cat }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="pg-form-group">
+              <label for="monthly_limit">Monthly Limit (₹)</label>
+              <input id="monthly_limit" name="monthly_limit" type="number" step="0.01" min="1" placeholder="0.00" required />
+            </div>
+            <button type="submit" class="pg-btn-submit"><i data-lucide="plus" class="w-4 h-4"></i> Add Budget</button>
+          </div>
+          <div id="formMsg" class="pg-form-msg"></div>
+        </form>
+      </div>
+
+      <!-- Budget Table -->
+      <div class="pg-table-card">
+        <div class="pg-table-head">
+          <h3>Monthly Budget Goals</h3>
+        </div>
+        {% if budgets %}
+        <div style="overflow-x:auto">
+          <table class="pg-table">
+            <thead>
+              <tr>
+                <th>#</th><th>Category</th><th>Limit</th><th>Spent</th><th>Remaining</th><th style="text-align:right">Used %</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for b in budgets %}
+              <tr>
+                <td><span class="pg-row-num">{{ loop.index }}</span></td>
+                <td style="font-weight:600">{{ b.category }}</td>
+                <td>₹{{ '%.2f' | format(b.monthly_limit) }}</td>
+                <td>₹{{ '%.2f' | format(b.spent_amount) }}</td>
+                <td>₹{{ '%.2f' | format(b.remaining) }}</td>
+                <td style="text-align:right">
+                  <div style="display:flex;align-items:center;gap:8px;justify-content:flex-end">
+                    <div style="width:80px;height:6px;background:var(--b2);border-radius:4px;overflow:hidden">
+                      <div style="width:{{ [b.percent,100]|min }}%;height:100%;background:{% if b.percent > 100 %}var(--danger){% elif b.percent >= 80 %}#f59e0b{% else %}var(--accent){% endif %};border-radius:4px"></div>
+                    </div>
+                    <span style="font-size:0.78rem;font-weight:600;color:{% if b.percent > 100 %}var(--danger){% elif b.percent >= 80 %}#f59e0b{% else %}var(--accent){% endif %}">{{ b.percent }}%</span>
+                  </div>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% else %}
+        <div class="pg-table-empty">
+          <i data-lucide="wallet" style="width:36px;height:36px;margin:0 auto 10px;display:block;color:var(--t3)"></i>
+          <p>No budget plans for this month yet. Add your first one above.</p>
+        </div>
+        {% endif %}
+      </div>
+    </main>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const form = document.getElementById('budgetForm');
+  const msg  = document.getElementById('formMsg');
+  if (!form) return;
+  form.addEventListener('submit', async e => {
+    e.preventDefault();
+    const fd = new FormData(form);
+    const now = new Date();
+    const payload = {
+      category:      fd.get('category'),
+      monthly_limit: parseFloat(fd.get('monthly_limit')),
+      month:         now.getMonth() + 1,
+      year:          now.getFullYear(),
+    };
+    const res = await fetch('/api/budgets/', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+    if (res.ok) {
+      msg.className = 'pg-form-msg success';
+      msg.textContent = '✓ Budget added!';
+      form.reset();
+      setTimeout(() => window.location.reload(), 800);
+    } else {
+      const err = await res.json().catch(() => ({}));
+      msg.className = 'pg-form-msg error';
+      msg.textContent = '✗ ' + (err.detail || 'Failed to add budget.');
+    }
+  });
+});
+</script>
+{% endblock %}

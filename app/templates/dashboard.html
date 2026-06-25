@@ -1,0 +1,398 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="ft-shell" id="ftShell">
+
+  <!-- SIDEBAR -->
+  <aside class="ft-sidebar" id="ftSidebar">
+    <div class="ft-sidebar-inner">
+      <div class="ft-brand">
+        <div class="ft-brand-icon">
+          <i data-lucide="zap" class="w-[17px] h-[17px] text-white"></i>
+        </div>
+        <span class="ft-brand-name">FinTrack</span>
+      </div>
+
+      <p class="ft-nav-label">Main</p>
+      <nav class="ft-nav">
+        <a href="/dashboard" class="ft-nav-item ft-active"><i data-lucide="layout-dashboard"></i><span>Dashboard</span></a>
+        <a href="/income"    class="ft-nav-item"><i data-lucide="trending-up"></i><span>Income</span></a>
+        <a href="/expenses"  class="ft-nav-item"><i data-lucide="receipt"></i><span>Expenses</span></a>
+        <a href="/budget"    class="ft-nav-item"><i data-lucide="wallet"></i><span>Budget</span></a>
+      </nav>
+
+      <p class="ft-nav-label">Portfolio</p>
+      <nav class="ft-nav">
+        <a href="/investments"  class="ft-nav-item"><i data-lucide="bar-chart-2"></i><span>Investments</span></a>
+        <a href="/savings-goals" class="ft-nav-item"><i data-lucide="piggy-bank"></i><span>Savings Goals</span></a>
+        <a href="/reports"      class="ft-nav-item"><i data-lucide="file-bar-chart"></i><span>Reports</span></a>
+      </nav>
+
+      <div class="ft-sidebar-spacer"></div>
+      <nav class="ft-nav">
+        <a href="/settings" class="ft-nav-item"><i data-lucide="settings-2"></i><span>Settings</span></a>
+      </nav>
+
+      <div class="ft-sidebar-user">
+        <div class="ft-user-av">{{ current_user.full_name[0] | upper }}</div>
+        <div class="ft-user-info">
+          <p class="ft-user-name">{{ current_user.full_name }}</p>
+          <p class="ft-user-plan">Premium Plan</p>
+        </div>
+        <a href="/auth/logout" class="ft-logout-btn" title="Sign out">
+          <i data-lucide="log-out" class="w-4 h-4"></i>
+        </a>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="ft-main-wrap" id="ftMainWrap">
+
+    <header class="ft-topnav">
+      <div class="ft-topnav-left">
+        <button class="ft-toggle-btn" id="ftToggle">
+          <i data-lucide="menu" class="w-[17px] h-[17px]"></i>
+        </button>
+        <div class="ft-breadcrumb">
+          <span class="ft-bc-root">FinTrack</span>
+          <i data-lucide="chevron-right" class="w-3.5 h-3.5" style="color:var(--t3)"></i>
+          <span class="ft-bc-page">Dashboard</span>
+        </div>
+      </div>
+      <div class="ft-topnav-right">
+        <div class="ft-search">
+          <i data-lucide="search" class="w-4 h-4" style="color:var(--t3);flex-shrink:0"></i>
+          <input type="text" placeholder="Search transactions…" autocomplete="off" />
+          <kbd class="ft-search-kbd">⌘K</kbd>
+        </div>
+        <div class="ft-month-badge">
+          <i data-lucide="calendar-days" class="w-3.5 h-3.5"></i>
+          <span>{{ today }}</span>
+        </div>
+        <button class="ft-icon-btn">
+          <i data-lucide="bell" class="w-4 h-4"></i>
+          <span class="ft-notif-pip"></span>
+        </button>
+        <div class="ft-topnav-av">{{ current_user.full_name[0] | upper }}</div>
+      </div>
+    </header>
+
+    <main class="ft-page">
+
+      <!-- ── HERO ─────────────────────────────────────── -->
+      <section class="ft-hero"> 
+        <main class="ft-page">
+
+  <!-- Welcome Message -->
+    <div class="welcome-banner">
+    <span class="welcome-text">
+        Welcome back, {{ current_user.full_name }} 👋
+    </span>
+    <span class="welcome-divider">-</span>
+
+    <span class="welcome-subtext">
+        Track your finances, monitor your goals, and grow your wealth.
+    </span>
+</div>
+  <!-- Net Worth Card -->
+  <div class="hero-card">
+      
+  </div>
+        <div class="ft-hero-card">
+          <div class="ft-hero-left">
+            <div class="ft-hero-eyebrow">
+              <span class="ft-pip ft-pip-success"></span>
+              <span>Total Net Worth</span>
+              <span class="ft-hero-tag">Live</span>
+            </div>
+            <div class="ft-hero-amount" id="heroNetWorth" data-target="{{ kpis.net_worth }}">
+              {{ kpis.net_worth }}
+            </div>
+            <p class="ft-hero-sub">Portfolio value as of {{ today }}</p>
+            <div class="ft-hero-stats">
+              <div class="ft-hstat">
+                <span class="ft-hstat-label">Savings Rate</span>
+                <span class="ft-hstat-value text-success">{{ kpis.savings_rate }}</span>
+              </div>
+              <div class="ft-hstat-div"></div>
+              <div class="ft-hstat">
+                <span class="ft-hstat-label">Invested</span>
+                <span class="ft-hstat-value" id="heroInvested" data-target="{{ kpis.total_investments }}">{{ kpis.total_investments }}</span>
+              </div>
+              <div class="ft-hstat-div"></div>
+              <div class="ft-hstat">
+                <span class="ft-hstat-label">Liquid Cash</span>
+                <span class="ft-hstat-value" id="heroSavings" data-target="{{ kpis.total_savings }}">{{ kpis.total_savings }}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="ft-hero-right">
+            <div class="ft-hero-spark-label">Net Worth Trend</div>
+            <div class="ft-hero-chart-wrap">
+              <canvas id="heroSparkChart"></canvas>
+            </div>
+            <div class="ft-hero-spark-foot">
+              <span style="color:var(--t3);font-size:0.72rem">6-month overview</span>
+              <span style="color:var(--accent2);font-size:0.72rem;font-weight:700">▲ 9.3%</span>
+            </div>
+          </div>
+
+          <div class="ft-hero-orb ft-hero-orb-1"></div>
+          <div class="ft-hero-orb ft-hero-orb-2"></div>
+        </div>
+      </section>
+
+      <!-- ── KPI CARDS ──────────────────────────────────── -->
+      <section class="ft-kpi-row">
+        <article class="ft-kpi-card ft-card">
+          <div class="ft-kpi-head">
+            <div class="ft-kpi-icon ft-kpi-icon-green"><i data-lucide="trending-up" class="w-4 h-4"></i></div>
+            <span class="ft-kpi-badge ft-badge-up">↑ 8.2%</span>
+          </div>
+          <p class="ft-kpi-label">Total Income</p>
+          <p class="ft-kpi-val" data-target="{{ kpis.total_income }}">{{ kpis.total_income }}</p>
+          <canvas class="ft-spark" id="sp0"></canvas>
+        </article>
+
+        <article class="ft-kpi-card ft-card">
+          <div class="ft-kpi-head">
+            <div class="ft-kpi-icon ft-kpi-icon-red"><i data-lucide="receipt" class="w-4 h-4"></i></div>
+            <span class="ft-kpi-badge ft-badge-down">↑ 3.1%</span>
+          </div>
+          <p class="ft-kpi-label">Total Expenses</p>
+          <p class="ft-kpi-val" data-target="{{ kpis.total_expenses }}">{{ kpis.total_expenses }}</p>
+          <canvas class="ft-spark" id="sp1"></canvas>
+        </article>
+
+        <article class="ft-kpi-card ft-card">
+          <div class="ft-kpi-head">
+            <div class="ft-kpi-icon ft-kpi-icon-sky"><i data-lucide="piggy-bank" class="w-4 h-4"></i></div>
+            <span class="ft-kpi-badge ft-badge-up">↑ 12.4%</span>
+          </div>
+          <p class="ft-kpi-label">Total Savings</p>
+          <p class="ft-kpi-val" data-target="{{ kpis.total_savings }}">{{ kpis.total_savings }}</p>
+          <canvas class="ft-spark" id="sp2"></canvas>
+        </article>
+
+        <article class="ft-kpi-card ft-card">
+          <div class="ft-kpi-head">
+            <div class="ft-kpi-icon ft-kpi-icon-amber"><i data-lucide="bar-chart-2" class="w-4 h-4"></i></div>
+            <span class="ft-kpi-badge ft-badge-up">↑ 5.7%</span>
+          </div>
+          <p class="ft-kpi-label">Investments</p>
+          <p class="ft-kpi-val" data-target="{{ kpis.total_investments }}">{{ kpis.total_investments }}</p>
+          <canvas class="ft-spark" id="sp3"></canvas>
+        </article>
+      </section>
+
+      <!-- ── TREND CHART ────────────────────────────────── -->
+      <section class="ft-section">
+        <div class="ft-card ft-trend-card">
+          <div class="ft-card-head">
+            <div>
+              <h3 class="ft-card-title">Income vs Expenses</h3>
+              <p class="ft-card-sub">6-month trend analysis</p>
+            </div>
+            <div class="ft-chart-legend">
+              <div class="ft-legend-item">
+                <span class="ft-legend-dot" style="background:var(--accent)"></span>Income
+              </div>
+              <div class="ft-legend-item">
+                <span class="ft-legend-dot" style="background:#F43F5E"></span>Expenses
+              </div>
+              <div class="ft-chart-tabs">
+                <button class="ft-tab ft-tab-active" data-chart-period="6m">6M</button>
+                <button class="ft-tab" data-chart-period="3m">3M</button>
+                <button class="ft-tab" data-chart-period="1m">1M</button>
+              </div>
+            </div>
+          </div>
+          <div class="ft-trend-chart-wrap">
+            <canvas id="trendChart"></canvas>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── TRANSACTIONS + DOUGHNUT ───────────────────── -->
+      <section class="ft-mid-grid">
+        <div class="ft-card ft-txn-card">
+          <div class="ft-card-head">
+            <div>
+              <h3 class="ft-card-title">Recent Transactions</h3>
+              <p class="ft-card-sub">Latest activity across all accounts</p>
+            </div>
+            <a href="/expenses" class="ft-view-all">View all <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i></a>
+          </div>
+
+          <div class="ft-txn-filters">
+            <button class="ft-filter-btn ft-filter-active">All</button>
+            <button class="ft-filter-btn">Income</button>
+            <button class="ft-filter-btn">Expenses</button>
+          </div>
+
+          <div class="ft-txn-list">
+            {% for expense in recent_expenses %}
+            <div class="ft-txn-row">
+              <div class="ft-txn-icon-wrap ft-txn-expense">
+                <i data-lucide="arrow-down-left" class="w-3.5 h-3.5"></i>
+              </div>
+              <div class="ft-txn-info">
+                <p class="ft-txn-name">{{ expense.expense_name }}</p>
+                <p class="ft-txn-meta">{{ expense.category }} · {{ expense.expense_date.strftime('%b %d, %Y') }}</p>
+              </div>
+              <div class="ft-txn-right">
+                <span class="ft-txn-amount ft-amount-neg">-₹{{ '%.2f' | format(expense.amount) }}</span>
+                <span class="ft-cat-chip">{{ expense.category }}</span>
+              </div>
+            </div>
+            {% endfor %}
+            {% for income in recent_incomes %}
+            <div class="ft-txn-row">
+              <div class="ft-txn-icon-wrap ft-txn-income">
+                <i data-lucide="arrow-up-right" class="w-3.5 h-3.5"></i>
+              </div>
+              <div class="ft-txn-info">
+                <p class="ft-txn-name">{{ income.source }}</p>
+                <p class="ft-txn-meta">{{ income.category }} · {{ income.income_date.strftime('%b %d, %Y') }}</p>
+              </div>
+              <div class="ft-txn-right">
+                <span class="ft-txn-amount ft-amount-pos">+₹{{ '%.2f' | format(income.amount) }}</span>
+                <span class="ft-cat-chip">{{ income.category }}</span>
+              </div>
+            </div>
+            {% endfor %}
+            {% if not recent_incomes and not recent_expenses %}
+            <div class="ft-empty">
+              <i data-lucide="inbox" class="w-8 h-8"></i>
+              <p>No transactions yet</p>
+            </div>
+            {% endif %}
+          </div>
+        </div>
+
+        <div class="ft-card ft-donut-card">
+          <div class="ft-card-head">
+            <div>
+              <h3 class="ft-card-title">Expense Breakdown</h3>
+              <p class="ft-card-sub">By category — all time</p>
+            </div>
+          </div>
+          <div class="ft-donut-wrap">
+            <canvas id="donutChart"></canvas>
+            <div class="ft-donut-center">
+              <p class="ft-donut-center-label">Total</p>
+              <p class="ft-donut-center-val" id="donutTotalVal">—</p>
+            </div>
+          </div>
+          <div class="ft-donut-legend" id="donutLegend"></div>
+        </div>
+      </section>
+
+      <!-- ── BUDGET GOALS ───────────────────────────────── -->
+      <section class="ft-section">
+        <div class="ft-card ft-budget-card">
+          <div class="ft-card-head">
+            <div>
+              <h3 class="ft-card-title">Budget Goals</h3>
+              <p class="ft-card-sub">Monthly spending limits & progress</p>
+            </div>
+            <a href="/budget" class="ft-view-all">Manage <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i></a>
+          </div>
+
+          <div class="ft-budget-grid">
+            {% for item in budget_status %}
+            <div class="ft-budget-item">
+              <div class="ft-budget-row">
+                <div class="ft-budget-icon-wrap ft-bicon-{{ item.status }}">
+                  <i data-lucide="wallet" class="w-4 h-4"></i>
+                </div>
+                <div class="ft-budget-info">
+                  <p class="ft-budget-cat">{{ item.category }}</p>
+                  <p class="ft-budget-meta">{{ item.spent }} of {{ item.limit }}</p>
+                </div>
+                <div class="ft-budget-pct ft-bpct-{{ item.status }}">{{ item.percent }}%</div>
+              </div>
+              <div class="ft-prog-track">
+                <div class="ft-prog-fill ft-prog-{{ item.status }}" style="width:{{ [item.percent,100]|min }}%"></div>
+              </div>
+              <p class="ft-budget-remain">
+                {% if item.status == 'danger' %}
+                  <span style="color:var(--danger);font-size:0.68rem">Over budget</span>
+                {% else %}
+                  <span>{{ item.remaining }} remaining</span>
+                {% endif %}
+              </p>
+            </div>
+            {% endfor %}
+            {% if not budget_status %}
+            <div class="ft-empty ft-empty-full">
+              <i data-lucide="wallet" class="w-8 h-8"></i>
+              <p>No budgets configured for this month</p>
+              <a href="/budget" class="ft-add-link">+ Add Budget</a>
+            </div>
+            {% endif %}
+          </div>
+
+          {% if goals %}
+          <div class="ft-goals-divider"><span>Savings Goals</span></div>
+          <div class="ft-goals-grid">
+            {% for goal in goals %}
+            {% set progress = (goal.current_amount / goal.target_amount * 100) if goal.target_amount else 0 %}
+            <div class="ft-goal-item">
+              <div class="ft-goal-top">
+                <p class="ft-goal-name">{{ goal.goal_name }}</p>
+                <span class="ft-goal-pct">{{ progress | round(0) | int }}%</span>
+              </div>
+              <div class="ft-prog-track">
+                <div class="ft-prog-fill ft-prog-accent" style="width:{{ [progress,100]|min }}%"></div>
+              </div>
+              <div class="ft-goal-foot">
+                <span>₹{{ '%.0f'|format(goal.current_amount) }} saved</span>
+                <span>Target: {{ goal.target_date.strftime('%b %Y') }}</span>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+          {% endif %}
+        </div>
+      </section>
+
+      <!-- ── AI INSIGHTS ────────────────────────────────── -->
+      <section class="ft-section">
+        <div class="ft-card ft-insights-card">
+          <div class="ft-card-head">
+            <div class="ft-insights-head-left">
+              <div class="ft-ai-badge">
+                <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
+                <span>AI Insights</span>
+              </div>
+              <div>
+                <h3 class="ft-card-title">Financial Insights</h3>
+                <p class="ft-card-sub">Personalised recommendations based on your data</p>
+              </div>
+            </div>
+            <button class="ft-refresh-btn" id="refreshInsights">
+              <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> Refresh
+            </button>
+          </div>
+          <div class="ft-insights-grid" id="insightsGrid"></div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+</div>
+
+<script>
+  window._ft = {
+    expenseLabels: {{ expense_labels         | tojson }},
+    expenseValues: {{ expense_values         | tojson }},
+    chartLabels:   {{ chart_labels           | tojson }},
+    incomeValues:  {{ income_values          | tojson }},
+    expenseTrend:  {{ expense_values_monthly | tojson }},
+    netWorthRaw:   "{{ kpis.net_worth }}",
+    totalExpRaw:   "{{ kpis.total_expenses }}",
+  };
+</script>
+{% endblock %}

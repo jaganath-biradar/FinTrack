@@ -1,0 +1,11 @@
+__pycache__/
+*.py[cod]
+*.sqlite
+.env
+.env.*
+*.log
+*.db
+alembic/versions/*.pyc
+.idea/
+.vscode/
+.DS_Store

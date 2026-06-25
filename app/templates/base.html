@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{{ page_title }} | FinTrack</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/static/css/style.css" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        darkMode: 'class',
+        corePlugins: { preflight: false },
+        theme: {
+          extend: {
+            fontFamily: { sans: ['Inter', 'DM Sans', 'sans-serif'] },
+            colors: {
+              bg:      '#060D14',
+              surface: '#0F1E2D',
+              accent:  '#10B981',
+              'accent2': '#34D399',
+              success: '#22C55E',
+              danger:  '#F43F5E',
+            },
+          },
+        },
+      };
+    </script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  </head>
+  <body class="font-sans antialiased min-h-screen" style="background:#060D14;color:#F0FDF4">
+    {% block content %}{% endblock %}
+    <script src="/static/js/app.js"></script>
+    <script>lucide.createIcons();</script>
+  </body>
+</html>
