@@ -19,6 +19,7 @@ Quick steps to deploy this FastAPI app to Render and migrate existing SQLite dat
 3) Create a Web Service
 
 - Dashboard → New → Web Service → connect GitHub repo + branch.
+- Set Runtime / Environment to `Python 3.12`.
 - Set Build Command: `pip install -r requirements.txt`
 - Set Start Command: `alembic upgrade head && gunicorn -k uvicorn.workers.UvicornWorker app.main:app --bind 0.0.0.0:$PORT`
 - Add environment variables: `SECRET_KEY` (secure string) and any others you need. If you created the database via Render UI, add the database and Render will expose `DATABASE_URL` automatically.

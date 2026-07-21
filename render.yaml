@@ -10,6 +10,7 @@ services:
   - type: "web"
     name: "personal-finance-web"
     env: "python"
+    runtime: "python-3.12.10"
     region: "oregon"
     branch: "main"
     plan: "starter"
