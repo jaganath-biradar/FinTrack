@@ -7,7 +7,7 @@ from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
 from app.config import load_env
 from app.database import get_db
-from app.models.user import User
+from app.crud import user as crud_user
 
 load_env()
 
@@ -34,11 +34,11 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None) -> s
     return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
 
 
-def get_user_by_email(db: Session, email: str) -> User | None:
-    return db.query(User).filter(User.email == email).first()
+def get_user_by_email(db: Session, email: str):
+    return crud_user.get_user_by_email(db, email)
 
 
-def authenticate_user(db: Session, email: str, password: str) -> User | None:
+def authenticate_user(db: Session, email: str, password: str):
     user = get_user_by_email(db, email)
     if not user or not verify_password(password, user.password_hash):
         return None
