@@ -8,6 +8,7 @@ from sqlalchemy.orm import Session
 from app.config import load_env
 from app.database import get_db
 from app.crud import user as crud_user
+from app.models.user import User
 
 load_env()
 

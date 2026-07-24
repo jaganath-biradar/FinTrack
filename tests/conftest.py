@@ -2,6 +2,7 @@ import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.pool import StaticPool
 
 from app.database import Base, get_db
 from app.main import app
@@ -13,7 +14,11 @@ from app.auth.utils import get_password_hash
 TEST_DATABASE_URL = "sqlite:///:memory:"
 
 
-engine = create_engine(TEST_DATABASE_URL, connect_args={"check_same_thread": False})
+engine = create_engine(
+    TEST_DATABASE_URL,
+    connect_args={"check_same_thread": False},
+    poolclass=StaticPool,
+)
 TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 
@@ -28,12 +33,13 @@ def create_test_database():
 def db_session():
     db = TestingSessionLocal()
     try:
-        # create a test user
-        pw = get_password_hash("testpass")
-        user = User(email="test@example.com", full_name="Test User", password_hash=pw)
-        db.add(user)
-        db.commit()
-        db.refresh(user)
+        existing_user = db.query(User).filter(User.email == "test@example.com").first()
+        if existing_user is None:
+            pw = get_password_hash("testpass")
+            user = User(email="test@example.com", full_name="Test User", password_hash=pw)
+            db.add(user)
+            db.commit()
+            db.refresh(user)
         yield db
     finally:
         db.close()

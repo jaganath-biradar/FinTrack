@@ -1,12 +1,17 @@
 from datetime import date
-from pydantic import BaseModel, ConfigDict
+from pydantic import AliasChoices, BaseModel, ConfigDict, Field
 
 
 class IncomeBase(BaseModel):
-    source: str
+    source: str = Field(
+        validation_alias=AliasChoices("source", "income_name"),
+        serialization_alias="income_name",
+    )
     amount: float
     income_date: date
     category: str
+
+    model_config = ConfigDict(populate_by_name=True)
 
 
 class IncomeCreate(IncomeBase):
