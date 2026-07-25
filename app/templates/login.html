@@ -23,6 +23,8 @@
     <div class="alert alert-danger">This link has expired. Please request a new one.</div>
     {% elif error == 'server' %}
     <div class="alert alert-danger">Something went wrong. Please try again.</div>
+    {% elif error == 'forbidden' %}
+    <div class="alert alert-danger">Session expired or invalid request. Please try again.</div>
     {% endif %}
 
     {% if registered == '1' and not request.query_params.get('verify') %}

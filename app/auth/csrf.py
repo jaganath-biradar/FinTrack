@@ -25,14 +25,17 @@ def validate_csrf_token(token: str, session_id: str) -> bool:
         return False
 
 
+def _fingerprint(request: Request) -> str:
+    """Use real client IP (X-Forwarded-For on Render) + user-agent."""
+    forwarded_for = request.headers.get("x-forwarded-for", "")
+    ip = forwarded_for.split(",")[0].strip() if forwarded_for else (request.client.host if request.client else "unknown")
+    return ip + request.headers.get("user-agent", "")
+
+
 def get_csrf_token(request: Request) -> str:
-    """Generate a CSRF token tied to the client IP + user-agent as session fingerprint."""
-    fingerprint = request.client.host + request.headers.get("user-agent", "")
-    return generate_csrf_token(fingerprint)
+    return generate_csrf_token(_fingerprint(request))
 
 
 def verify_csrf(request: Request, form_token: str) -> None:
-    """Raise 403 if CSRF token is invalid."""
-    fingerprint = request.client.host + request.headers.get("user-agent", "")
-    if not validate_csrf_token(form_token, fingerprint):
+    if not validate_csrf_token(form_token, _fingerprint(request)):
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Invalid CSRF token")

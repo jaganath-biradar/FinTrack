@@ -73,6 +73,10 @@ async def http_exception_handler(request: Request, exc: HTTPException):
             return RedirectResponse(url="/login", status_code=302)
     if exc.status_code == 403:
         if "text/html" in request.headers.get("accept", ""):
+            # Redirect back to the originating form page
+            referer = request.headers.get("referer", "")
+            if "/register" in referer:
+                return RedirectResponse(url="/register?error=forbidden", status_code=302)
             return RedirectResponse(url="/login?error=forbidden", status_code=302)
     return JSONResponse(status_code=exc.status_code, content={"detail": exc.detail})
 

@@ -19,6 +19,8 @@
     <div class="alert alert-danger">Password must be at least 8 characters.</div>
     {% elif error == 'server' %}
     <div class="alert alert-danger">Something went wrong. Please try again.</div>
+    {% elif error == 'forbidden' %}
+    <div class="alert alert-danger">Session expired or invalid request. Please try again.</div>
     {% endif %}
 
     <form action="/auth/register-form" method="post">
