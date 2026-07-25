@@ -57,12 +57,13 @@ def login_form(
         return RedirectResponse(url="/login?error=invalid", status_code=status.HTTP_302_FOUND)
     access_token = create_access_token(data={"sub": user.email})
     response = RedirectResponse(url="/dashboard", status_code=status.HTTP_302_FOUND)
+    is_secure = os.getenv("RENDER", "") != ""
     response.set_cookie(
         key="access_token",
         value=access_token,
         httponly=True,
         samesite="lax",
-        secure=False,
+        secure=is_secure,
         max_age=60 * int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "60")),
     )
     return response

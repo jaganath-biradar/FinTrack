@@ -12,7 +12,9 @@ from app.models.user import User
 
 load_env()
 
-SECRET_KEY = os.getenv("SECRET_KEY", "supersecretlocalkey")
+SECRET_KEY = os.getenv("SECRET_KEY")
+if not SECRET_KEY:
+    raise RuntimeError("SECRET_KEY environment variable is not set")
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "60"))
 
@@ -107,5 +109,4 @@ def get_current_user_api(
     return user
 
 
-def _redirect_to_login() -> HTTPException:
-    return HTTPException(status_code=status.HTTP_302_FOUND, headers={"Location": "/login"})
+
