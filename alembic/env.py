@@ -1,8 +1,7 @@
 import os
 import sys
 from logging.config import fileConfig
-from sqlalchemy import engine_from_config, pool
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, pool
 from alembic import context
 from dotenv import load_dotenv
 
@@ -11,20 +10,18 @@ load_dotenv()
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
 from app.database import Base
-from app.models import User, Income, Expense, Budget, Investment, SavingsGoal
+from app.models import User, Income, Expense, Budget, Investment, SavingsGoal  # noqa: F401
 
 config = context.config
 fileConfig(config.config_file_name)
-section = config.get_section(config.config_ini_section)
-section["sqlalchemy.url"] = os.getenv(
-    "DATABASE_URL",
-    section.get("sqlalchemy.url"),
-)
+
+DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./personal_finance.db")
+config.set_main_option("sqlalchemy.url", DATABASE_URL)
+
 
 def run_migrations_offline():
-    url = section["sqlalchemy.url"]
     context.configure(
-        url=url,
+        url=DATABASE_URL,
         target_metadata=Base.metadata,
         literal_binds=True,
         dialect_opts={"paramstyle": "named"},
@@ -34,15 +31,12 @@ def run_migrations_offline():
 
 
 def run_migrations_online():
-    connectable = engine_from_config(
-        section,
-        prefix="sqlalchemy.",
-        poolclass=pool.NullPool,
-    )
+    connectable = create_engine(DATABASE_URL, poolclass=pool.NullPool)
     with connectable.connect() as connection:
         context.configure(connection=connection, target_metadata=Base.metadata)
         with context.begin_transaction():
             context.run_migrations()
+
 
 if context.is_offline_mode():
     run_migrations_offline()
