@@ -12,9 +12,7 @@ from app.models.user import User
 
 load_env()
 
-SECRET_KEY = os.getenv("SECRET_KEY")
-if not SECRET_KEY:
-    raise RuntimeError("SECRET_KEY environment variable is not set")
+SECRET_KEY = os.getenv("SECRET_KEY", "fallback-dev-key-change-in-production")
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "60"))
 
