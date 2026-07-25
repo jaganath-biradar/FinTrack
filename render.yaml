@@ -1,24 +1,15 @@
-# render.yaml — template to create a Postgres DB and Web Service on Render.
-# Fill `branch`, `region`, and any plan fields as desired before using with render CLI.
-
 services:
-  - type: "postgres"
-    name: "personal-finance-db"
-    plan: "free"
-    databaseName: "personal_finance"
-
-  - type: "web"
-    name: "personal-finance-web"
-    env: "python"
-    runtime: "python-3.12.10"
-    region: "oregon"
-    branch: "main"
-    plan: "starter"
-    buildCommand: "pip install -r requirements.txt"
+  - type: web
+    name: fintrack
+    env: python
+    runtime: python3.12
+    region: oregon
+    branch: main
+    plan: free
+    buildCommand: "pip install --upgrade pip setuptools wheel && pip install -r requirements.txt"
     startCommand: "alembic upgrade head && gunicorn -k uvicorn.workers.UvicornWorker app.main:app --bind 0.0.0.0:$PORT"
     envVars:
-      - key: DATABASE_URL
-        fromDatabase:
-          name: personal-finance-db
       - key: SECRET_KEY
-        generator: secret
+        generateValue: true
+      - key: ACCESS_TOKEN_EXPIRE_MINUTES
+        value: "60"

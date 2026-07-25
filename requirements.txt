@@ -1,31 +1,32 @@
-fastapi==0.116.1
-uvicorn[standard]==0.35.0
+fastapi==0.130.0
+uvicorn[standard]==0.32.0
+starlette==0.39.0
 
-SQLAlchemy==2.0.42
+sqlalchemy==2.0.45
 alembic==1.16.4
 
-psycopg[binary]==3.2.9
-
-python-dotenv==1.1.1
+python-dotenv==1.0.0
 
 passlib[bcrypt]==1.7.4
-bcrypt==4.3.0
+bcrypt==4.0.1
 
-python-jose==3.5.0
+python-jose==3.3.0
 
-pydantic==2.11.7
+pydantic==2.7.0
+pydantic-core==2.41.5
 
 email-validator==2.3.0
-python-multipart==0.0.20
+python-multipart==0.0.22
 
-Jinja2==3.1.6
+jinja2==3.1.6
 itsdangerous==2.2.0
 
-reportlab==4.4.3
+reportlab==4.5.1
 
-gunicorn==23.0.0
+gunicorn==21.2.0
 
 httpx==0.28.1
 
-pytest==8.4.1
-pytest-cov==6.2.1
+pytest==9.0.3
+pytest-cov==7.1.0
+
