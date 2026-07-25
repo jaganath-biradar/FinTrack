@@ -15,12 +15,32 @@
 
     {% if error == 'invalid' %}
     <div class="alert alert-danger">Incorrect email or password. Please try again.</div>
+    {% elif error == 'unverified' %}
+    <div class="alert alert-danger">Please verify your email before signing in.</div>
+    {% elif error == 'invalid_token' %}
+    <div class="alert alert-danger">Invalid or expired link. Please try again.</div>
+    {% elif error == 'expired_token' %}
+    <div class="alert alert-danger">This link has expired. Please request a new one.</div>
+    {% elif error == 'server' %}
+    <div class="alert alert-danger">Something went wrong. Please try again.</div>
     {% endif %}
-    {% if registered == '1' %}
+
+    {% if registered == '1' and not request.query_params.get('verify') %}
     <div class="alert alert-success">Account created! You can now sign in.</div>
+    {% elif registered == '1' %}
+    <div class="alert alert-success">Account created! Please check your email to verify your account.</div>
+    {% endif %}
+    {% if verified == '1' %}
+    <div class="alert alert-success">Email verified! You can now sign in.</div>
+    {% endif %}
+    {% if reset == 'sent' %}
+    <div class="alert alert-success">If that email exists, a reset link has been sent.</div>
+    {% elif reset == 'done' %}
+    <div class="alert alert-success">Password reset successfully. Please sign in.</div>
     {% endif %}
 
     <form action="/auth/login-form" method="post">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}" />
       <div class="form-group">
         <label for="username">Email</label>
         <input id="username" name="username" type="email"
@@ -32,6 +52,7 @@
                placeholder="••••••••" required autocomplete="current-password" />
       </div>
       <button type="submit" class="btn-primary">Sign In</button>
+      <p class="form-note"><a href="/forgot-password">Forgot password?</a></p>
       <p class="form-note">Don't have an account? <a href="/register">Register now</a></p>
     </form>
 

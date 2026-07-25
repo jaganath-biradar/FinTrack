@@ -3,6 +3,7 @@ from fastapi import APIRouter, Depends, Request
 from fastapi.templating import Jinja2Templates
 from sqlalchemy import func, extract
 from app.auth.utils import get_current_user
+from app.auth.csrf import get_csrf_token
 from app.database import get_db
 from app.models import Income, Expense, Budget, Investment, SavingsGoal
 
@@ -30,8 +31,11 @@ def login_page(request: Request):
         name="login.html",
         context={
             "page_title": "Login",
+            "csrf_token": get_csrf_token(request),
             "error": request.query_params.get("error"),
             "registered": request.query_params.get("registered"),
+            "verified": request.query_params.get("verified"),
+            "reset": request.query_params.get("reset"),
         },
     )
 
@@ -43,6 +47,33 @@ def register_page(request: Request):
         name="register.html",
         context={
             "page_title": "Register",
+            "csrf_token": get_csrf_token(request),
+            "error": request.query_params.get("error"),
+        },
+    )
+
+
+@router.get("/forgot-password")
+def forgot_password_page(request: Request):
+    return templates.TemplateResponse(
+        request=request,
+        name="forgot_password.html",
+        context={
+            "page_title": "Forgot Password",
+            "csrf_token": get_csrf_token(request),
+        },
+    )
+
+
+@router.get("/auth/reset-password")
+def reset_password_page(request: Request):
+    return templates.TemplateResponse(
+        request=request,
+        name="reset_password.html",
+        context={
+            "page_title": "Reset Password",
+            "csrf_token": get_csrf_token(request),
+            "token": request.query_params.get("token", ""),
             "error": request.query_params.get("error"),
         },
     )
