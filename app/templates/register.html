@@ -13,8 +13,7 @@
     <h1>Create your account</h1>
     <p>Securely manage your income, expenses, savings and investments.</p>
 
-    {% set qs = request.query_params %}
-    {% if qs.get('error') == 'exists' %}
+    {% if error == 'exists' %}
     <div class="alert alert-danger">That email is already registered. <a href="/login">Sign in instead.</a></div>
     {% endif %}
 

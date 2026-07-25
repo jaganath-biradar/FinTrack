@@ -13,11 +13,10 @@
     <h1>Welcome back</h1>
     <p>Sign in to your personal finance dashboard.</p>
 
-    {% set qs = request.query_params %}
-    {% if qs.get('error') == 'invalid' %}
+    {% if error == 'invalid' %}
     <div class="alert alert-danger">Incorrect email or password. Please try again.</div>
     {% endif %}
-    {% if qs.get('registered') == '1' %}
+    {% if registered == '1' %}
     <div class="alert alert-success">Account created! You can now sign in.</div>
     {% endif %}
 

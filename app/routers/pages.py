@@ -26,17 +26,29 @@ def render_page(request: Request, page_title: str, current_user, template_name: 
 
 @router.get("/login")
 def login_page(request: Request):
+    error = request.query_params.get("error")
+    registered = request.query_params.get("registered")
     return templates.TemplateResponse(
         "login.html",
-        {"request": request, "page_title": "Login"},
+        {
+            "request": request,
+            "page_title": "Login",
+            "error": error,
+            "registered": registered,
+        },
     )
 
 
 @router.get("/register")
 def register_page(request: Request):
+    error = request.query_params.get("error")
     return templates.TemplateResponse(
         "register.html",
-        {"request": request, "page_title": "Register"},
+        {
+            "request": request,
+            "page_title": "Register",
+            "error": error,
+        },
     )
 
 
