@@ -1,5 +1,5 @@
 from datetime import datetime
-from sqlalchemy import Column, Integer, String, DateTime, Boolean
+from sqlalchemy import Column, Integer, String, DateTime
 from sqlalchemy.orm import relationship
 from app.database import Base
 
@@ -12,14 +12,6 @@ class User(Base):
     email = Column(String(200), unique=True, index=True, nullable=False)
     password_hash = Column(String(256), nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
-
-    # Email verification
-    is_verified = Column(Boolean, default=False, nullable=False)
-    verification_token = Column(String(128), nullable=True)
-
-    # Password reset
-    reset_token = Column(String(128), nullable=True)
-    reset_token_expires = Column(DateTime, nullable=True)
 
     incomes = relationship("Income", back_populates="user", cascade="all, delete-orphan")
     expenses = relationship("Expense", back_populates="user", cascade="all, delete-orphan")
