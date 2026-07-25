@@ -2,8 +2,6 @@ from fastapi import FastAPI, Request
 from fastapi.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-from app.database import engine
-from app.models import Base  # noqa: F401
 from app.routers import api_router
 
 app = FastAPI(
@@ -15,8 +13,6 @@ app = FastAPI(
 templates = Jinja2Templates(directory="app/templates")
 app.mount("/static", StaticFiles(directory="app/static"), name="static")
 app.include_router(api_router)
-
-Base.metadata.create_all(bind=engine)
 
 
 @app.get("/", include_in_schema=False)

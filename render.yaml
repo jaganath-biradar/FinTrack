@@ -2,7 +2,7 @@ services:
   - type: web
     name: fintrack
     env: python
-    runtime: python3.12
+    runtime: python3.11
     region: oregon
     branch: main
     plan: free
