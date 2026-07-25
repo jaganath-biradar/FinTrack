@@ -15,13 +15,13 @@ from app.models import User, Income, Expense, Budget, Investment, SavingsGoal  #
 config = context.config
 fileConfig(config.config_file_name)
 
-DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./personal_finance.db")
+DATABASE_URL = "sqlite:///./personal_finance.db"
 config.set_main_option("sqlalchemy.url", DATABASE_URL)
 
 
 def run_migrations_offline():
     context.configure(
-        url=DATABASE_URL,
+        url="sqlite:///./personal_finance.db",
         target_metadata=Base.metadata,
         literal_binds=True,
         dialect_opts={"paramstyle": "named"},
@@ -31,7 +31,7 @@ def run_migrations_offline():
 
 
 def run_migrations_online():
-    connectable = create_engine(DATABASE_URL, poolclass=pool.NullPool)
+    connectable = create_engine("sqlite:///./personal_finance.db", poolclass=pool.NullPool, connect_args={"check_same_thread": False})
     with connectable.connect() as connection:
         context.configure(connection=connection, target_metadata=Base.metadata)
         with context.begin_transaction():
