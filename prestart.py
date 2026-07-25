@@ -1,12 +1,11 @@
 import sys
-from alembic.config import Config
-from alembic import command
-
-print("Running database migrations...")
+print("Creating database tables...")
 try:
-    alembic_cfg = Config("alembic.ini")
-    command.upgrade(alembic_cfg, "head")
-    print("Migrations completed successfully.")
+    from app.database import engine, Base
+    # Import all models so Base.metadata knows about every table
+    from app.models import User, Income, Expense, Budget, Investment, SavingsGoal  # noqa: F401
+    Base.metadata.create_all(bind=engine)
+    print(f"Tables created successfully on: {engine.url}")
 except Exception as e:
-    print(f"Migration failed: {e}", file=sys.stderr)
+    print(f"Table creation failed: {e}", file=sys.stderr)
     sys.exit(1)
