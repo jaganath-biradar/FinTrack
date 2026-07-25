@@ -11,6 +11,9 @@ import sqlalchemy as sa
 revision = "0001_initial"
 down_revision = None
 branch_labels = None
+depends_on = None
+
+
 def upgrade():
     op.create_table(
         "users",
@@ -20,6 +23,7 @@ def upgrade():
         sa.Column("password_hash", sa.String(length=256), nullable=False),
         sa.Column("created_at", sa.DateTime(), nullable=False),
         sa.UniqueConstraint("email"),
+        if_not_exists=True,
     )
     op.create_table(
         "income",
@@ -29,6 +33,7 @@ def upgrade():
         sa.Column("amount", sa.Numeric(12, 2), nullable=False),
         sa.Column("income_date", sa.Date(), nullable=False),
         sa.Column("category", sa.String(length=80), nullable=False),
+        if_not_exists=True,
     )
     op.create_table(
         "expenses",
@@ -38,6 +43,7 @@ def upgrade():
         sa.Column("amount", sa.Numeric(12, 2), nullable=False),
         sa.Column("expense_date", sa.Date(), nullable=False),
         sa.Column("category", sa.String(length=80), nullable=False),
+        if_not_exists=True,
     )
     op.create_table(
         "budgets",
@@ -47,6 +53,7 @@ def upgrade():
         sa.Column("monthly_limit", sa.Numeric(12, 2), nullable=False),
         sa.Column("month", sa.Integer(), nullable=False),
         sa.Column("year", sa.Integer(), nullable=False),
+        if_not_exists=True,
     )
     op.create_table(
         "investments",
@@ -56,6 +63,7 @@ def upgrade():
         sa.Column("amount", sa.Numeric(12, 2), nullable=False),
         sa.Column("investment_date", sa.Date(), nullable=False),
         sa.Column("expected_return", sa.Numeric(12, 2), nullable=True),
+        if_not_exists=True,
     )
     op.create_table(
         "savings_goals",
@@ -66,7 +74,9 @@ def upgrade():
         sa.Column("current_amount", sa.Numeric(12, 2), nullable=False),
         sa.Column("target_date", sa.Date(), nullable=False),
         sa.Column("status", sa.String(length=40), nullable=False),
+        if_not_exists=True,
     )
+
 
 def downgrade():
     op.drop_table("savings_goals")
