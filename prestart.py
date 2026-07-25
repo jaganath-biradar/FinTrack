@@ -21,7 +21,8 @@ if DATABASE_URL.startswith("postgres://"):
     DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
     print("Fixed postgres:// -> postgresql://")
 
-print(f"Is SQLite: {DATABASE_URL.startswith('sqlite')}")
+is_sqlite = DATABASE_URL.startswith("sqlite")
+print(f"Is SQLite: {is_sqlite}")
 
 # Step 3: Import Base and models
 try:
@@ -58,6 +59,33 @@ try:
     print("SUCCESS: All tables created/verified")
 except Exception as e:
     print(f"FAILED create_all: {e}", file=sys.stderr)
+    sys.exit(1)
+
+# Step 6: Add missing columns to existing tables (safe ALTER TABLE)
+from sqlalchemy import text, inspect
+
+new_columns = [
+    ("users", "is_verified",         "BOOLEAN NOT NULL DEFAULT FALSE" if not is_sqlite else "BOOLEAN NOT NULL DEFAULT 0"),
+    ("users", "verification_token",  "VARCHAR(128)"),
+    ("users", "reset_token",         "VARCHAR(128)"),
+    ("users", "reset_token_expires", "TIMESTAMP"),
+]
+
+try:
+    with engine.connect() as conn:
+        inspector = inspect(engine)
+        existing_cols = {c["name"] for c in inspector.get_columns("users")}
+        print(f"Existing users columns: {existing_cols}")
+        for table, col, col_type in new_columns:
+            if col not in existing_cols:
+                print(f"Adding column: {table}.{col}")
+                conn.execute(text(f"ALTER TABLE {table} ADD COLUMN {col} {col_type}"))
+                conn.commit()
+                print(f"  -> Added {col}")
+            else:
+                print(f"  -> {col} already exists, skipping")
+except Exception as e:
+    print(f"FAILED column migration: {e}", file=sys.stderr)
     sys.exit(1)
 
 print("=" * 60)
