@@ -2,7 +2,12 @@ from fastapi import FastAPI, Request
 from fastapi.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
+from app.database import engine, Base
+from app.models import User, Income, Expense, Budget, Investment, SavingsGoal  # noqa: F401
 from app.routers import api_router
+
+# Create all tables on startup — safe to run multiple times (create_all is idempotent)
+Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
     title="Personal Finance Management",
