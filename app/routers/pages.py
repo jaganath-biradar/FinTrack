@@ -53,6 +53,32 @@ def register_page(request: Request):
     )
 
 
+@router.get("/forgot-password")
+def forgot_password_page(request: Request):
+    return templates.TemplateResponse(
+        request=request,
+        name="forgot_password.html",
+        context={
+            "page_title": "Forgot Password",
+            "csrf_token": get_csrf_token(request),
+        },
+    )
+
+
+@router.get("/reset-password")
+def reset_password_page(request: Request):
+    return templates.TemplateResponse(
+        request=request,
+        name="reset_password.html",
+        context={
+            "page_title": "Reset Password",
+            "csrf_token": get_csrf_token(request),
+            "token": request.query_params.get("token", ""),
+            "error": request.query_params.get("error"),
+        },
+    )
+
+
 
 @router.get("/income")
 def income_page(request: Request, current_user=Depends(get_current_user), db=Depends(get_db)):

@@ -5,6 +5,7 @@ from app.models.expense import Expense
 from app.models.budget import Budget
 from app.models.investment import Investment
 from app.models.savings_goal import SavingsGoal
+from app.models.password_reset import PasswordReset
 
 __all__ = [
     "Base",
@@ -14,4 +15,5 @@ __all__ = [
     "Budget",
     "Investment",
     "SavingsGoal",
+    "PasswordReset",
 ]
