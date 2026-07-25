@@ -3,6 +3,7 @@ from datetime import datetime, timedelta, timezone
 from jose import JWTError, jwt
 from passlib.context import CryptContext
 from fastapi import Depends, HTTPException, Request, status
+from fastapi.responses import RedirectResponse
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
 from app.config import load_env
@@ -60,21 +61,21 @@ def get_current_user(
     db: Session = Depends(get_db),
 ) -> User:
     """
-    Used by page routes.  On failure → redirect to /login (browser-friendly).
+    Used by page routes. On failure → redirect to /login (browser-friendly).
     """
     raw = _extract_token(request, token)
     if raw is None:
-        raise HTTPException(status_code=status.HTTP_302_FOUND, headers={"Location": "/login"})
+        return RedirectResponse(url="/login", status_code=status.HTTP_302_FOUND)
     try:
         payload = jwt.decode(raw, SECRET_KEY, algorithms=[ALGORITHM])
         email: str | None = payload.get("sub")
         if email is None:
-            raise HTTPException(status_code=status.HTTP_302_FOUND, headers={"Location": "/login"})
+            return RedirectResponse(url="/login", status_code=status.HTTP_302_FOUND)
     except JWTError:
-        raise HTTPException(status_code=status.HTTP_302_FOUND, headers={"Location": "/login"})
+        return RedirectResponse(url="/login", status_code=status.HTTP_302_FOUND)
     user = get_user_by_email(db, email)
     if user is None:
-        raise HTTPException(status_code=status.HTTP_302_FOUND, headers={"Location": "/login"})
+        return RedirectResponse(url="/login", status_code=status.HTTP_302_FOUND)
     return user
 
 
