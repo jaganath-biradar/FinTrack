@@ -61,21 +61,22 @@ def get_current_user(
     db: Session = Depends(get_db),
 ) -> User:
     """
-    Used by page routes. On failure → redirect to /login (browser-friendly).
+    Used by page routes. On failure → raise 302 redirect properly.
     """
+    from starlette.responses import RedirectResponse as _Redirect
     raw = _extract_token(request, token)
-    if raw is None:
-        return RedirectResponse(url="/login", status_code=status.HTTP_302_FOUND)
+    if not raw:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Not authenticated")
     try:
         payload = jwt.decode(raw, SECRET_KEY, algorithms=[ALGORITHM])
         email: str | None = payload.get("sub")
-        if email is None:
-            return RedirectResponse(url="/login", status_code=status.HTTP_302_FOUND)
+        if not email:
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Not authenticated")
     except JWTError:
-        return RedirectResponse(url="/login", status_code=status.HTTP_302_FOUND)
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Not authenticated")
     user = get_user_by_email(db, email)
     if user is None:
-        return RedirectResponse(url="/login", status_code=status.HTTP_302_FOUND)
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Not authenticated")
     return user
 
 
