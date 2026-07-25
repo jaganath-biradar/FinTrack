@@ -16,38 +16,34 @@ def safe_sum(value):
 
 def render_page(request: Request, page_title: str, current_user, template_name: str, **context):
     page_context = {
-        "request": request,
         "page_title": page_title,
         "current_user": current_user,
     }
     page_context.update(context)
-    return templates.TemplateResponse(template_name, page_context)
+    return templates.TemplateResponse(request=request, name=template_name, context=page_context)
 
 
 @router.get("/login")
 def login_page(request: Request):
-    error = request.query_params.get("error")
-    registered = request.query_params.get("registered")
     return templates.TemplateResponse(
-        "login.html",
-        {
-            "request": request,
+        request=request,
+        name="login.html",
+        context={
             "page_title": "Login",
-            "error": error,
-            "registered": registered,
+            "error": request.query_params.get("error"),
+            "registered": request.query_params.get("registered"),
         },
     )
 
 
 @router.get("/register")
 def register_page(request: Request):
-    error = request.query_params.get("error")
     return templates.TemplateResponse(
-        "register.html",
-        {
-            "request": request,
+        request=request,
+        name="register.html",
+        context={
             "page_title": "Register",
-            "error": error,
+            "error": request.query_params.get("error"),
         },
     )
 

@@ -17,8 +17,7 @@ def safe_sum(value):
 
 def recent_months(today: date, count: int = 6):
     months = []
-    year = today.year
-    month = today.month
+    year, month = today.year, today.month
     for _ in range(count):
         months.append((year, month, date(year, month, 1).strftime("%b")))
         month -= 1
@@ -108,44 +107,38 @@ def dashboard(request: Request, db: Session = Depends(get_db), current_user=Depe
             .scalar()
         )
         used_percent = round((spent_amount / float(budget.monthly_limit) * 100), 1) if budget.monthly_limit else 0.0
-        budget_status.append(
-            {
-                "category": budget.category,
-                "limit": f"₹{budget.monthly_limit:,.2f}",
-                "spent": f"₹{spent_amount:,.2f}",
-                "remaining": f"₹{max(budget.monthly_limit - spent_amount, 0.0):,.2f}",
-                "percent": used_percent,
-                "status": "danger" if used_percent > 100 else "warning" if used_percent >= 80 else "success",
-            }
-        )
+        budget_status.append({
+            "category": budget.category,
+            "limit": f"₹{budget.monthly_limit:,.2f}",
+            "spent": f"₹{spent_amount:,.2f}",
+            "remaining": f"₹{max(budget.monthly_limit - spent_amount, 0.0):,.2f}",
+            "percent": used_percent,
+            "status": "danger" if used_percent > 100 else "warning" if used_percent >= 80 else "success",
+        })
 
     recent_incomes = (
         db.query(Income)
         .filter(Income.user_id == current_user.id)
         .order_by(Income.income_date.desc())
-        .limit(5)
-        .all()
+        .limit(5).all()
     )
     recent_expenses = (
         db.query(Expense)
         .filter(Expense.user_id == current_user.id)
         .order_by(Expense.expense_date.desc())
-        .limit(5)
-        .all()
+        .limit(5).all()
     )
-
     goals = (
         db.query(SavingsGoal)
         .filter(SavingsGoal.user_id == current_user.id)
         .order_by(SavingsGoal.target_date)
-        .limit(4)
-        .all()
+        .limit(4).all()
     )
 
     return templates.TemplateResponse(
-        "dashboard.html",
-        {
-            "request": request,
+        request=request,
+        name="dashboard.html",
+        context={
             "page_title": "Dashboard",
             "current_user": current_user,
             "today": today.strftime("%B %Y"),
