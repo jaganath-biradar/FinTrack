@@ -137,6 +137,10 @@ def dashboard(request: Request, db: Session = Depends(get_db), current_user=Depe
         .limit(4).all()
     )
 
+    # Convert Decimal to float for all chart data (JSON serialization)
+    for b in budget_status:
+        b["percent"] = float(b["percent"])
+
     return templates.TemplateResponse(
         request=request,
         name="dashboard.html",
@@ -153,12 +157,12 @@ def dashboard(request: Request, db: Session = Depends(get_db), current_user=Depe
                 "savings_rate": f"{savings_rate}%",
             },
             "expense_labels": expense_categories,
-            "expense_values": expense_breakdown,
+            "expense_values": [float(v) for v in expense_breakdown],
             "chart_labels": [label for _, _, label in chart_months],
-            "income_values": income_vs_expense,
-            "expense_values_monthly": expense_trend,
+            "income_values": [float(v) for v in income_vs_expense],
+            "expense_values_monthly": [float(v) for v in expense_trend],
             "investment_labels": investment_labels,
-            "investment_values": investment_breakdown,
+            "investment_values": [float(v) for v in investment_breakdown],
             "budget_status": budget_status,
             "recent_incomes": recent_incomes,
             "recent_expenses": recent_expenses,
