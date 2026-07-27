@@ -37,8 +37,7 @@
       ### 1. Clone the repository
 
       ```bash
-      git clone https://github.com/your-username/fintrack.git  # replace with your actual URL
-      cd fintrack
+      git clone https://github.com/jaganath-biradar/FinTrack.git   
       ```
 
       ### 2. Create and activate a virtual environment
@@ -118,12 +117,25 @@
       ---
 
       ## Notes
-
-      - The app uses **PostgreSQL** by default — no external database setup required.
-      - The `personal_finance.db` file is excluded from version control via `.gitignore`.
-      - To reset the database, delete `personal_finance.db` and re-run `alembic upgrade head`.
-
+- The application uses PostgreSQL as its primary database.
+- Configure the DATABASE_URL environment variable before running the application.
+- Use Alembic to manage database migrations.
       ---
+
+      ## Live Demo
+
+🌐 Live Application: https://your-render-app.onrender.com
+
+📂 GitHub Repository: https://github.com/jaganath-biradar/FinTrack
+## Security Features
+
+- JWT Authentication
+- CSRF Protection
+- Rate Limiting
+- Secure Password Hashing
+- Security Headers
+- Password Reset
+- Environment-based Configuration
 
       ## License
 
