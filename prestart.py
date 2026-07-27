@@ -23,6 +23,7 @@ try:
     from app.models.budget import Budget
     from app.models.investment import Investment
     from app.models.savings_goal import SavingsGoal
+    from app.models.password_reset import PasswordReset
 
     Base.metadata.create_all(bind=engine)
     print("create_all() done")
