@@ -1,6 +1,6 @@
       # FinTrack — Personal Finance Management System
 
-      > A fintech-style personal finance dashboard built with **FastAPI**, **SQLAlchemy**, **SQLite**, **Alembic**, **Jinja2**, and **Chart.js**.
+      > A fintech-style personal finance dashboard built with **FastAPI**, **SQLAlchemy**, **PostgreSQL**, **Alembic**, **Jinja2**, and **Chart.js**.
 
       ---
 
@@ -9,7 +9,7 @@
       | Layer | Technology |
       |---|---|
       | Backend | FastAPI, SQLAlchemy, Alembic |
-      | Database | SQLite |
+      | Database | PostgreSQL |
       | Auth | JWT (cookie-based) via python-jose |
       | Templating | Jinja2 |
       | Charts | Chart.js |
@@ -81,7 +81,7 @@
 
       ### 7. Open in browser
 
-      Visit [http://127.0.0.1:80001](http://127.0.0.1:80001)
+      Visit: https://github.com/your-username/fintrack.git
 
       ---
 
@@ -119,7 +119,7 @@
 
       ## Notes
 
-      - The app uses **SQLite** by default — no external database setup required.
+      - The app uses **PostgreSQL** by default — no external database setup required.
       - The `personal_finance.db` file is excluded from version control via `.gitignore`.
       - To reset the database, delete `personal_finance.db` and re-run `alembic upgrade head`.
 
