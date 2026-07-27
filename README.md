@@ -124,8 +124,7 @@
 
       ## Live Demo
 
-🌐 Live Application: https://your-render-app.onrender.com
-
+🌐 Live Application: URL https://fintrack-4nvo.onrender.com
 📂 GitHub Repository: https://github.com/jaganath-biradar/FinTrack
 ## Security Features
 
