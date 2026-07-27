@@ -1,3 +1,4 @@
+from decimal import Decimal
 from datetime import date
 from fastapi import APIRouter, Depends, Request
 from fastapi.templating import Jinja2Templates
@@ -12,7 +13,8 @@ templates = Jinja2Templates(directory="app/templates")
 
 
 def safe_sum(value):
-    return float(value or 0.0)
+    from decimal import Decimal
+    return Decimal(value) if value is not None else Decimal("0")
 
 
 def recent_months(today: date, count: int = 6):
@@ -43,9 +45,9 @@ def dashboard(request: Request, db: Session = Depends(get_db), current_user=Depe
     total_investments = safe_sum(
         db.query(func.sum(Investment.amount)).filter(Investment.user_id == current_user.id).scalar()
     )
-    total_savings = max(total_income - total_expenses, 0.0)
+    total_savings = max(total_income - total_expenses, Decimal("0"))
     net_worth = total_income - total_expenses + total_investments
-    savings_rate = round((total_savings / total_income * 100), 1) if total_income else 0.0
+    savings_rate = round((total_savings / total_income * 100), 1) if total_income else Decimal("0")
 
     expense_categories = ["Food", "Rent", "Travel", "Shopping", "Healthcare", "Utilities", "Entertainment", "Education", "Others"]
     expense_breakdown = [
@@ -106,12 +108,12 @@ def dashboard(request: Request, db: Session = Depends(get_db), current_user=Depe
             .filter(extract("year", Expense.expense_date) == current_year)
             .scalar()
         )
-        used_percent = round((spent_amount / float(budget.monthly_limit) * 100), 1) if budget.monthly_limit else 0.0
+        used_percent = round((spent_amount / Decimal(str(budget.monthly_limit)) * 100), 1) if budget.monthly_limit else Decimal("0")
         budget_status.append({
             "category": budget.category,
             "limit": f"₹{budget.monthly_limit:,.2f}",
             "spent": f"₹{spent_amount:,.2f}",
-            "remaining": f"₹{max(budget.monthly_limit - spent_amount, 0.0):,.2f}",
+            "remaining": f"₹{max(budget.monthly_limit - spent_amount, Decimal('0')):,.2f}",
             "percent": used_percent,
             "status": "danger" if used_percent > 100 else "warning" if used_percent >= 80 else "success",
         })

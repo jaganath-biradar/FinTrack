@@ -1,3 +1,4 @@
+from decimal import Decimal
 from datetime import date
 from fastapi import APIRouter, Depends, Request
 from fastapi.templating import Jinja2Templates
@@ -12,7 +13,7 @@ templates = Jinja2Templates(directory="app/templates")
 
 
 def safe_sum(value):
-    return float(value or 0.0)
+    return Decimal(value) if value is not None else Decimal("0")
 
 
 def render_page(request: Request, page_title: str, current_user, template_name: str, **context):
@@ -140,10 +141,10 @@ def budget_page(request: Request, current_user=Depends(get_current_user), db=Dep
         budget_lines.append(
             {
                 "category": budget.category,
-                "monthly_limit": float(budget.monthly_limit),
+                "monthly_limit": budget.monthly_limit,
                 "spent_amount": spent_amount,
-                "remaining": max(float(budget.monthly_limit) - spent_amount, 0.0),
-                "percent": round((spent_amount / float(budget.monthly_limit) * 100), 1) if budget.monthly_limit else 0.0,
+                "remaining": max(budget.monthly_limit - spent_amount, Decimal("0")),
+                "percent": round((spent_amount / budget.monthly_limit * 100), 1) if budget.monthly_limit else Decimal("0"),
             }
         )
     return render_page(
