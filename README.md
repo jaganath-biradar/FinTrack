@@ -78,9 +78,6 @@
       uvicorn app.main:app --reload
       ```
 
-      ### 7. Open in browser
-
-      Visit: https://github.com/your-username/fintrack.git
 
       ---
 
@@ -116,10 +113,13 @@
 
       ---
 
-      ## Notes
-- The application uses PostgreSQL as its primary database.
-- Configure the DATABASE_URL environment variable before running the application.
-- Use Alembic to manage database migrations.
+    
+## Notes
+
+- Uses PostgreSQL as the primary database.
+- Database schema is managed using Alembic migrations.
+- Configure the `DATABASE_URL` and `SECRET_KEY` environment variables before running the application.
+- Designed with a responsive UI for desktop and mobile devices.
       ---
 
       ## Live Demo
